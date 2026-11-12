@@ -5,6 +5,8 @@
 
 Signal Desktop links with Signal on [Android](https://github.com/signalapp/Signal-Android) or [iOS](https://github.com/signalapp/Signal-iOS) and lets you message from your Windows, macOS, and Linux computers.
 
+**air/OS:** this fork's `airos` branch builds Signal Desktop for air/OS (Haiku) on Aurora; see [scripts/haiku/README.md](scripts/haiku/README.md).
+
 [Install the production version](https://signal.org/download/) or help us out by [installing the beta version](https://support.signal.org/hc/articles/360007318471-Signal-Beta).
 
 ## Got a question?

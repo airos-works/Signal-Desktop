@@ -728,7 +728,15 @@ async function createWindow() {
       contextIsolation: !isTestEnvironment(getEnvironment()),
       preload: isTestEnvironment(getEnvironment())
         ? join(rootDir, 'ts', 'windows', 'main', 'tsx.preload.js')
-        : join(rootDir, 'bundles', 'preload', 'wrapper.js'),
+        : join(
+            rootDir,
+            'bundles',
+            'preload',
+            // On air/OS the page has no node:vm to compile the bundle with a
+            // code cache: Aurora loads the bundle itself, unwrapped
+            // (scripts/haiku/build.sh).
+            OS.isAirOS() ? 'haiku.js' : 'wrapper.js'
+          ),
       spellcheck,
     },
     icon: windowIcon,

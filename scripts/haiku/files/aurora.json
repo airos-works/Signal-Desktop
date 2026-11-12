@@ -1,0 +1,6 @@
+{
+	"app": "app",
+	"env": {
+		"AURORA_PLATFORM": "linux"
+	}
+}

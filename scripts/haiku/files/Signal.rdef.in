@@ -1,0 +1,29 @@
+/* Signal's launcher on air/OS: Aurora's aurora-host with the app's name,
+   icon and signature (see Aurora's host/Launcher.h). Multiple launch: a
+   link for Signal starts it again, and the first instance takes the link
+   (app.requestSingleInstanceLock). scripts/haiku/cross.sh fills in the
+   version. */
+
+resource app_signature "application/x-vnd.signal-desktop";
+
+resource app_flags B_MULTIPLE_LAUNCH;
+
+resource app_version {
+	major  = @MAJOR@,
+	middle = @MIDDLE@,
+	minor  = @MINOR@,
+	variety = B_APPV_FINAL,
+	internal = 0,
+	short_info = "Signal",
+	long_info = "Signal Desktop @VERSION@: private messaging, on air/OS with Aurora"
+};
+
+/* The links Signal opens (app.setAsDefaultProtocolClient): its own (sgnl,
+   such as signal.me links and group invitations) and the captcha page's
+   answer (signalcaptcha). */
+resource file_types message {
+	"types" = "application/x-vnd.Be.URL.sgnl",
+	"types" = "application/x-vnd.Be.URL.signalcaptcha"
+};
+
+resource(101, "BEOS:ICON") #'VICN' import "Signal.hvif";

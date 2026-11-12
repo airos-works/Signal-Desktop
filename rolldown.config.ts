@@ -7,6 +7,7 @@ import { join, relative } from 'node:path';
 import { defineConfig } from 'rolldown';
 import type { RolldownOptions } from 'rolldown';
 import { transform } from 'oxc-transform';
+import { airosPreload } from './scripts/haiku/rolldown.preload.ts';
 
 const external = [
   // Native libraries
@@ -143,6 +144,9 @@ if (isProd) {
 }
 
 export default defineConfig([
+  // air/OS: the main window's preload in one file (scripts/haiku)
+  ...(process.env.SIGNAL_AIROS === '1' ? [airosPreload(defaults)] : []),
+
   // Each sandboxed bundle has to be separate from the rest since
   // they cannot use `require()`
   ...Object.entries(sandboxPreload).map(([key, value]): RolldownOptions => {
