@@ -110,6 +110,12 @@ cargo_env() {
 		: "${RUST_TARGET_PATH:?the directory with aarch64-unknown-haiku.json}"
 		export RUST_TARGET_PATH
 		RUSTFLAGS="-Zunstable-options --cfg aes_armv8"
+		# BoringSSL reads an ARM CPU's features from the OS (cpu_aarch64_*
+		# for Linux, Apple, the BSDs...), which it cannot do on Haiku: they
+		# are the compiler's instead. armv8-a: NEON, and no crypto
+		# extensions, which the Raspberry Pi 4 lacks.
+		export "CFLAGS_$triple=-DOPENSSL_STATIC_ARMCAP -march=armv8-a"
+		export "CXXFLAGS_$triple=-DOPENSSL_STATIC_ARMCAP -march=armv8-a"
 	fi
 	export RUSTFLAGS
 }
