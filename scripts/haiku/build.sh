@@ -50,6 +50,15 @@ cp background.html about.html screenShare.html pdf.html permissions_popup.html \
 for page in background about screenShare pdf permissions_popup debug_log loading call_diagnostic; do
 	[[ -f $APP/$page.html ]] || { echo "missing $page.html" >&2; exit 1; }
 done
+# The other windows' pages load classic scripts (rolldown.preload.ts
+# airosDom): WebKit runs no ES module scripts from file: pages.
+for page in "$APP"/*.html; do
+	sed -i -E 's#<script type="module" src="bundles/dom/([A-Za-z]+)\.js"></script>#<script defer src="bundles/dom-haiku/\1.js"></script>#' "$page"
+	! grep -q 'type="module"' "$page" || { echo "$page still loads an ES module" >&2; exit 1; }
+	for script in $(grep -o 'bundles/dom-haiku/[A-Za-z]*\.js' "$page"); do
+		[[ -f $APP/$script ]] || { echo "no $script for $page: build with SIGNAL_AIROS=1" >&2; exit 1; }
+	done
+done
 mkdir -p "$APP/_locales"
 (cd build/compact-locales && find . -name values.json -o -name keys.json | cpio -pdm --quiet "$APP/_locales")
 mkdir -p "$APP/stylesheets"
@@ -65,6 +74,8 @@ for file in available-locales locale-display-names country-display-names dns-fal
 done
 mkdir -p "$APP/sticker-creator"
 cp -a sticker-creator/dist "$APP/sticker-creator/"
+! grep -q 'type="module"' "$APP/sticker-creator/dist/index.html" \
+	|| { echo "the sticker creator still loads an ES module: build with SIGNAL_AIROS=1" >&2; exit 1; }
 # The package.json electron-builder writes: the environment of the build.
 node -e '
 const fs = require("fs");

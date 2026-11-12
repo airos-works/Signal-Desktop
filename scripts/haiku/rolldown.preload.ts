@@ -98,3 +98,30 @@ export function airosPreload(defaults: RolldownOptions): RolldownOptions {
     },
   };
 }
+
+// The windows besides the main one (about, debug log, permissions, PDF,
+// screen share, call diagnostics, the loading dialog) load their page as an
+// ES module from file: (bundles/dom). WebKit gives every file: URL an origin
+// of its own and fetches module scripts with CORS, so those never run on
+// air/OS; a classic script does. Each becomes one classic script,
+// bundles/dom-haiku/<name>.js, which build.sh puts in their pages.
+export function airosDom(
+  defaults: RolldownOptions,
+  sandboxDOM: Record<string, string>
+): Array<RolldownOptions> {
+  return Object.entries(sandboxDOM).map(([key, value]) => ({
+    ...defaults,
+    input: { [key.replace(/^dom\//, 'dom-haiku/')]: value },
+    platform: 'browser',
+    external: ['electron'],
+    transform: {
+      ...defaults.transform,
+      target: 'es2024',
+    },
+    output: {
+      ...defaults.output,
+      format: 'iife',
+      codeSplitting: false,
+    },
+  }));
+}

@@ -72,6 +72,28 @@ printf '#!/bin/sh\nexec %sgcc --sysroot=%s -specs=%s "$@"\n' "$CROSS" "$SYSROOT"
 printf '#!/bin/sh\nexec %sg++ --sysroot=%s -specs=%s "$@"\n' "$CROSS" "$SYSROOT" "$UNWIND_SPECS" > "$BIN/haiku-c++"
 chmod 755 "$BIN/haiku-cc" "$BIN/haiku-c++"
 
+# BoringSSL's CMake build (boring-sys) for Haiku: the target named in a
+# toolchain file, so CMake never takes the build machine for it, and without
+# BoringSSL's tests and benchmarks (their configure checks would run Haiku
+# programs here).
+TOOLCHAIN=$WORK/haiku-$ARCH.cmake
+case $ARCH in
+	x86_64) processor=x86_64 ;;
+	arm64) processor=aarch64 ;;
+esac
+cat > "$TOOLCHAIN" <<CMAKE
+set(CMAKE_SYSTEM_NAME Haiku)
+set(CMAKE_SYSTEM_PROCESSOR $processor)
+set(CMAKE_C_COMPILER $BIN/haiku-cc)
+set(CMAKE_CXX_COMPILER $BIN/haiku-c++)
+set(CMAKE_ASM_COMPILER $BIN/haiku-cc)
+set(CMAKE_FIND_ROOT_PATH $SYSROOT)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(BUILD_TESTING OFF CACHE BOOL "no BoringSSL tests for Haiku" FORCE)
+CMAKE
+
 # Cargo for the Haiku target: std built here (a tier 3 target), linked by the
 # SDK's GCC; C and C++ (BoringSSL, SQLCipher's crypto) with the same.
 triple=${RUST_TARGET//-/_}
@@ -79,6 +101,7 @@ cargo_env() {
 	export CARGO_UNSTABLE_BUILD_STD=std,panic_unwind
 	export "CARGO_TARGET_${triple^^}_LINKER=$BIN/haiku-cc"
 	export "CC_$triple=$BIN/haiku-cc" "CXX_$triple=$BIN/haiku-c++" "AR_$triple=${CROSS}ar"
+	export "CMAKE_TOOLCHAIN_FILE_$triple=$TOOLCHAIN"
 	# bindgen parses BoringSSL's headers for the target, with GCC's own
 	# headers (stddef.h) as clang has none of its own for Haiku.
 	export "BINDGEN_EXTRA_CLANG_ARGS_$triple=--sysroot=$SYSROOT --target=$RUST_TARGET -isystem $(${CROSS}gcc -print-file-name=include)"
