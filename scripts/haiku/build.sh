@@ -85,6 +85,15 @@ pkg.environment = "production";
 delete pkg.devDependencies; delete pkg.scripts; delete pkg.build;
 fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + "\n");
 ' "$APP/package.json"
+# No self-updates: air/OS updates Signal with its package (pkgman). Signal's
+# updater has nothing to install there and would only fail at every start.
+node -e '
+const fs = require("fs");
+const file = process.argv[1];
+const config = JSON.parse(fs.readFileSync(file, "utf8"));
+config.updatesEnabled = false;
+fs.writeFileSync(file, JSON.stringify(config) + "\n");
+' "$APP/config/local-production.json"
 # The main window's preload for Aurora, in one file (rolldown.preload.ts).
 [[ -f $APP/bundles/preload/haiku.js ]] || { echo "no bundles/preload/haiku.js: build with SIGNAL_AIROS=1" >&2; exit 1; }
 node "$HAIKU/stage-modules.mjs" "$APP"
