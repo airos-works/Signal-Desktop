@@ -9,6 +9,19 @@ Signal Desktop links with Signal on [Android](https://github.com/signalapp/Signa
 
 [Install the production version](https://signal.org/download/) or help us out by [installing the beta version](https://support.signal.org/hc/articles/360007318471-Signal-Beta).
 
+<!-- airos-ci:latest-builds:start -->
+## Latest builds
+
+Built automatically by air/OS CI from commit `8c6e130` on 2026-11-13 ([all files](https://github.com/airos-works/Signal-Desktop/releases/tag/latest)).
+
+| Architecture | Package |
+|---|---|
+| arm64 | [signal_desktop-8.35.0-1-arm64.hpkg](https://github.com/airos-works/Signal-Desktop/releases/download/latest/signal_desktop-8.35.0-1-arm64.hpkg) |
+| x86_64 | [signal_desktop-8.35.0-1-x86_64.hpkg](https://github.com/airos-works/Signal-Desktop/releases/download/latest/signal_desktop-8.35.0-1-x86_64.hpkg) |
+
+Install with `pkgman install <file>`, or copy the file into `/boot/system/packages`. Haiku SDK: x86_64 hrev60207-2615-g2bc5e42fb7, arm64 hrev60207-2615-g2bc5e42fb7.
+<!-- airos-ci:latest-builds:end -->
+
 ## Got a question?
 
 You can find answers to a number of frequently asked questions on our [support site](https://support.signal.org/).
